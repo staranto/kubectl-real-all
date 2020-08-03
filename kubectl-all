@@ -1,0 +1,19 @@
+#! /bin/bash
+
+# See if there is -n.
+for a in "$@"; do
+    if [ "${a}" = "-n" ] || [ "${a}" = "--namespace" ]; then
+        n="--namespaced"
+        break
+    fi
+done
+
+if [ -z ${OC_ALL+x} ]; then
+    grep_opt="^"
+else
+    grep_opt="--invert-match --file $OC_ALL"
+fi
+
+oc api-resources --verbs list ${n} -o name | \
+    grep ${grep_opt} | \
+    xargs -n 1 oc get --show-kind --no-headers=false --ignore-not-found ${@:1}
