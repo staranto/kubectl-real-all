@@ -1,9 +1,11 @@
 #! /bin/bash
 
 # See if there is -n.
-for a in "$@"; do
-    if [ "${a}" = "-n" ] || [ "${a}" = "--namespace" ]; then
-        n="--namespaced"
+all="--all-namespaces"
+for x in "$@"; do
+    if [ "${x}" = "-n" ] || [ "${x}" = "--namespace" ]; then
+        ns="--namespaced"
+        unset all
         break
     fi
 done
@@ -14,6 +16,6 @@ else
     grep_opt="--invert-match --file $OC_ALL"
 fi
 
-oc api-resources --verbs list ${n} -o name | \
+oc api-resources --verbs list ${ns} -o name | \
     grep ${grep_opt} | \
-    xargs -n 1 oc get --show-kind --no-headers=false --ignore-not-found ${@:1}
+    xargs -n 1 oc get --show-kind --no-headers=false --ignore-not-found ${all} ${@:1}
